@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 async def run(crawler: BiliUserAlbumCrawler, uid: str, begin: int, end: int, ps: int = 30, coro: int = 5):
-    async for idx, data in crawler.get_many(uid, begin=begin, end=end, ps=ps, coro=coro):
+    async for data in crawler.get_many(uid, begin=begin, end=end, ps=ps, coro=coro):
         code, message = data['code'], data['message']
 
         if code != 0:
@@ -38,9 +38,19 @@ async def download_task(semaphore, session, url: str, dirpath: str, filename: st
 
 
 def main(
-    uid: str, dirpath: str = '.', begin: int = 0, end: int = 1,
-    ps: int = 30, req_coro_num: int = 5, download_coro_num: int = 5
+    uid: str = typer.Argument(..., help='用户uid'),
+    dirpath: str = typer.Option('.', help='保存图片的目录路径'),
+    begin: int = typer.Option(0, help='相簿起始页'),
+    end: int = typer.Option(1, help='相簿结束页  下载范围为 [begin, end)'),
+    ps: int = typer.Option(30, help='一页返回的数据个数，最大值为 50，大于这个值会报错'),
+    req_coro_num: int = typer.Option(5, help='并发请求数'),
+    download_coro_num: int = typer.Option(5, help='并发下载数')
 ):
+    """
+    下载b站指定用户的相簿图片并保存至本地
+
+    e.g.: python app.py 2 --begin 0 --end 10 --dirpath './images/piaoxiu'
+    """
     async def worker(dirpath):
         tasks = []
         semaphore = asyncio.Semaphore(download_coro_num)
