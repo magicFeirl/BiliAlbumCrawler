@@ -6,6 +6,7 @@
 
 **运行**
 
-> 先安装 requirements.txt 内的依赖。需要 Python3.7+。
+1. `pip install -r requirements.txt` 安装依赖
+2. 升级到 Python3.7+
 
-`python app.py --help`
+3. `python app.py --help` 运行程序
