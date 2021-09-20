@@ -61,4 +61,4 @@ class BiliUserAlbumCrawler():
         tasks = [asyncio.create_task(worker(pn)) for pn in range(begin, end)]
 
         for pn, task in enumerate(tasks):
-            yield pn, await task
+            yield await task
