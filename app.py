@@ -14,19 +14,23 @@ logging.basicConfig(level=logging.INFO)
 
 
 async def run(crawler: BiliUserAlbumCrawler, uid: str, begin: int, end: int, ps: int = 30, coro: int = 5):
+    pn = begin
+	
     async for data in crawler.get_many(uid, begin=begin, end=end, ps=ps, coro=coro):
         code, message = data['code'], data['message']
 
         if code != 0:
             logging.error(f'\n接口返回值出错: {code}, Message: {message}\n')
             break
-
-        if not data['data']:
-            # logging.info(f'用户 {uid} 第 {idx} 页无数据，退出')
-            break
-
+		
         items = data['data']['items'] or []
 
+        if not items:
+            logging.info(f'用户 {uid} 第 {pn} 页无数据，退出')
+            break
+			
+        pn += 1 
+		
         for item in items:
             for pic in item['pictures']:
                 yield pic['img_src']
